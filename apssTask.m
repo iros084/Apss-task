@@ -1,4 +1,4 @@
-%collecting nessesacy data for calculating the equlibrium temperature.
+% Collecting necessary data for calculating the equilibrium temperature.
 mass = 1.33;
 cross_section_area = 0.060;
 area_surface = 0.010;
@@ -7,41 +7,36 @@ Albedo = 0.35;
 absorbitivity = 0.52;
 internal_heat = 6.9684;
 
-%constants
+% Constants
 Stefan_Boltzmann = 5.67e-8;
 constant_solar_flux = 1354;
 earth_IR_temp = 255;
 
-%distances between the earth and salalite.
-earth_rad = 6378;
-alt = 500;
-dist = (earth_rad + alt);
-surface_earth = 5.2*10e14;
-view_factor = area_surface / (4 * pi * dist^2);
+% Distances between the Earth and satellite.
+earth_rad = 6378000;  % Earth's radius in meters
+alt = 500000;  % Altitude in meters
 
-%calculating the amount of direct heat absorved by the sun.
-qsolar_flux = absorbitivity*constant_solar_flux*cross_section_area;
+R = 6378000;  % Radius of the sphere
+d = 6378000+5000;  % Distance from the flat surface to the sphere center
 
-%calculating the amount of energy absorbed by the sun on earth
-qsolar_earth = constant_solar_flux * pi * (earth_rad * 1000)^2;
+% Calculate the view factor
+view_factor = 1 - sqrt(1 - (R / (R + d))^2);
+
+% Calculating the amount of direct heat absorbed by the satellite.
+qsolar_flux = absorbitivity * constant_solar_flux * area_surface*3;
+
+% Calculating the energy absorbed by the Earth and reflected back at the satellite.
+qalbedo = absorbitivity * area_surface * constant_solar_flux * Albedo * view_factor;
+
+% Calculating the energy radiated by the Earth.
+qIR = Stefan_Boltzmann * emissivity * area_surface * view_factor * earth_IR_temp;
 
 
-%calculating the energy absorbed by the earth reflected back at the salalite.
-qalbedo = Albedo*qsolar_earth;
-
-qout = qalbedo/qsolar_earth;
-
-
-%calcularing the energy radiated by the earth.
-qIR = Stefan_Boltzmann*emissivity*area_surface*view_factor*earth_IR_temp;
-
-disp(qIR);
 disp(qsolar_flux);
 disp(qalbedo);
+disp(qIR);
 
-
-equilibrium_temperature = (qsolar_flux+qalbedo+qIR) / (emissivity * cross_section_area * Stefan_Boltzmann)^(1/4);
+% Calculating the equilibrium temperature.
+equilibrium_temperature = ((qsolar_flux + qalbedo + qIR) / (emissivity * cross_section_area * Stefan_Boltzmann))^(1/4);
 
 disp(equilibrium_temperature);
-
-
